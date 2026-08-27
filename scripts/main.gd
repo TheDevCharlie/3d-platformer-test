@@ -10,16 +10,13 @@ enum GameState { PLAYING, WON, GAME_OVER }
 
 var _game_state: GameState = GameState.PLAYING
 var _elapsed_time: float = 0.0
-var _is_time_stopped: bool = false
 var _defeated_enemy_ids: Dictionary = {}
 var _total_coins_in_level: int = 0
 var _collected_coins_count: int = 0
 
 func _ready() -> void:
-	# Ensure Main processes input even when the game world is paused
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().paused = false
-	_is_time_stopped = false
 	_game_state = GameState.PLAYING
 	_elapsed_time = 0.0
 	
@@ -27,17 +24,20 @@ func _ready() -> void:
 	_setup_level_entities()
 
 func _process(delta: float) -> void:
-	# Strictly freeze time accumulation whenever game is won, lost, or paused
-	if not _is_time_stopped and _game_state == GameState.PLAYING and not get_tree().paused:
+	# Only accumulate and update time while actively playing and unpaused
+	if _game_state == GameState.PLAYING and not get_tree().paused:
 		_elapsed_time += delta
 		if hud:
 			hud.update_timer(get_formatted_time(_elapsed_time))
 
-func _unhandled_input(event: InputEvent) -> void:
-	# Pressing R at any time (playing, won, or lost) restarts the run cleanly
+func _input(event: InputEvent) -> void:
+	# Pressing R anywhere restarts the run cleanly
 	if event.is_action_pressed("reset") or (event is InputEventKey and event.keycode == KEY_R and event.pressed):
-		get_tree().paused = false
-		get_tree().reload_current_scene()
+		restart_game()
+
+func restart_game() -> void:
+	get_tree().paused = false
+	get_tree().reload_current_scene()
 
 func _setup_level_entities() -> void:
 	if not hud:
@@ -46,6 +46,10 @@ func _setup_level_entities() -> void:
 		player = find_child("Player", true, false) as PlayerController
 	if not goal_flag:
 		goal_flag = find_child("GoalFlag", true, false) as GoalFlag
+
+	if hud:
+		if not hud.restart_requested.is_connected(restart_game):
+			hud.restart_requested.connect(restart_game)
 
 	# Connect Player Death
 	if player:
@@ -107,13 +111,12 @@ func _on_enemy_eliminated(enemy_id: int) -> void:
 		hud.add_defeated_enemy()
 
 func _trigger_victory() -> void:
-	if _game_state != GameState.PLAYING or _is_time_stopped:
+	if _game_state != GameState.PLAYING:
 		return
 		
-	_is_time_stopped = true
 	_game_state = GameState.WON
-	
 	var final_time_str: String = get_formatted_time(_elapsed_time)
+	
 	if hud:
 		hud.update_timer(final_time_str)
 		hud.show_victory(final_time_str)
@@ -122,13 +125,12 @@ func _trigger_victory() -> void:
 	get_tree().paused = true
 
 func _trigger_game_over() -> void:
-	if _game_state != GameState.PLAYING or _is_time_stopped:
+	if _game_state != GameState.PLAYING:
 		return
 		
-	_is_time_stopped = true
 	_game_state = GameState.GAME_OVER
-	
 	var final_time_str: String = get_formatted_time(_elapsed_time)
+	
 	if hud:
 		hud.update_timer(final_time_str)
 		hud.show_game_over(final_time_str)

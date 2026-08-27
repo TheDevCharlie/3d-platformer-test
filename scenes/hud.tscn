@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud"]
 
@@ -17,7 +17,7 @@ corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_Modal"]
-bg_color = Color(0.1, 0.12, 0.16, 0.92)
+bg_color = Color(0.1, 0.12, 0.16, 0.95)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
@@ -29,7 +29,22 @@ corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 shadow_size = 12
 
+[sub_resource type="StyleBoxFlat" id="StyleBox_Btn"]
+bg_color = Color(0.25, 0.65, 0.35, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_BtnRed"]
+bg_color = Color(0.75, 0.25, 0.25, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [node name="HUD" type="CanvasLayer"]
+process_mode = 3
 script = ExtResource("1_hud")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
@@ -259,7 +274,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Panel" type="PanelContainer" parent="VictoryScreen/Center"]
-custom_minimum_size = Vector2(400, 260)
+custom_minimum_size = Vector2(400, 290)
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBox_Modal")
@@ -309,13 +324,12 @@ theme_override_font_sizes/font_size = 16
 text = "Enemies Defeated: 0 / 0"
 horizontal_alignment = 1
 
-[node name="RestartPrompt" type="Label" parent="VictoryScreen/Center/Panel/Margin/VBox"]
+[node name="VictoryRestartBtn" type="Button" parent="VictoryScreen/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
-mouse_filter = 2
-theme_override_colors/font_color = Color(0.5, 1, 0.5, 1)
 theme_override_font_sizes/font_size = 16
-text = "Press R to Play Again!"
-horizontal_alignment = 1
+theme_override_styles/normal = SubResource("StyleBox_Btn")
+text = "🔄 Play Again (Press R)"
 
 [node name="GameOverScreen" type="Control" parent="."]
 visible = false
@@ -337,7 +351,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Panel" type="PanelContainer" parent="GameOverScreen/Center"]
-custom_minimum_size = Vector2(380, 240)
+custom_minimum_size = Vector2(380, 270)
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBox_Modal")
@@ -381,10 +395,9 @@ theme_override_font_sizes/font_size = 16
 text = "Time Survived: 00:00.00"
 horizontal_alignment = 1
 
-[node name="RestartPrompt" type="Label" parent="GameOverScreen/Center/Panel/Margin/VBox"]
+[node name="GameOverRestartBtn" type="Button" parent="GameOverScreen/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
-mouse_filter = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
 theme_override_font_sizes/font_size = 16
-text = "Press R to Try Again!"
-horizontal_alignment = 1
+theme_override_styles/normal = SubResource("StyleBox_BtnRed")
+text = "🔄 Try Again (Press R)"

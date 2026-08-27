@@ -20,8 +20,12 @@ class_name PlatformerHUD
 @onready var victory_time_label: Label = $VictoryScreen/Center/Panel/Margin/VBox/TimeResultLabel
 @onready var victory_coins_label: Label = $VictoryScreen/Center/Panel/Margin/VBox/CoinsResultLabel
 @onready var victory_enemies_label: Label = $VictoryScreen/Center/Panel/Margin/VBox/EnemiesResultLabel
+@onready var victory_restart_btn: Button = $VictoryScreen/Center/Panel/Margin/VBox/VictoryRestartBtn
 @onready var game_over_panel: Control = $GameOverScreen
 @onready var game_over_time_label: Label = $GameOverScreen/Center/Panel/Margin/VBox/TimeSurvivedLabel
+@onready var game_over_restart_btn: Button = $GameOverScreen/Center/Panel/Margin/VBox/GameOverRestartBtn
+
+signal restart_requested
 
 var total_coins: int = 0
 var collected_coins: int = 0
@@ -36,6 +40,14 @@ func _ready() -> void:
 		victory_panel.visible = false
 	if game_over_panel:
 		game_over_panel.visible = false
+		
+	if victory_restart_btn:
+		victory_restart_btn.pressed.connect(_on_restart_button_pressed)
+	if game_over_restart_btn:
+		game_over_restart_btn.pressed.connect(_on_restart_button_pressed)
+
+func _on_restart_button_pressed() -> void:
+	restart_requested.emit()
 
 func _resolve_node_references() -> void:
 	if not coin_label:
@@ -66,10 +78,14 @@ func _resolve_node_references() -> void:
 		victory_coins_label = find_child("CoinsResultLabel", true, false) as Label
 	if not victory_enemies_label:
 		victory_enemies_label = find_child("EnemiesResultLabel", true, false) as Label
+	if not victory_restart_btn:
+		victory_restart_btn = find_child("VictoryRestartBtn", true, false) as Button
 	if not game_over_panel:
 		game_over_panel = find_child("GameOverScreen", true, false) as Control
 	if not game_over_time_label:
 		game_over_time_label = find_child("TimeSurvivedLabel", true, false) as Label
+	if not game_over_restart_btn:
+		game_over_restart_btn = find_child("GameOverRestartBtn", true, false) as Button
 
 func set_total_coins(count: int) -> void:
 	total_coins = count
@@ -153,7 +169,7 @@ func hide_overlays() -> void:
 
 func _pop_screen(screen: Control) -> void:
 	screen.scale = Vector2(0.8, 0.8)
-	var tween: Tween = create_tween()
+	var tween: Tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(screen, "scale", Vector2(1.0, 1.0), 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _animate_label(lbl: Label) -> void:
