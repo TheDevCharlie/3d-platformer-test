@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud"]
+[ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="2_pause"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_HP_BG"]
 bg_color = Color(0.15, 0.15, 0.2, 0.8)
@@ -17,7 +18,7 @@ corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_Modal"]
-bg_color = Color(0.1, 0.12, 0.16, 0.95)
+bg_color = Color(0.1, 0.12, 0.16, 0.96)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
@@ -27,17 +28,17 @@ corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
-shadow_size = 12
+shadow_size = 14
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_Btn"]
-bg_color = Color(0.25, 0.65, 0.35, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBox_BtnGreen"]
+bg_color = Color(0.2, 0.75, 0.35, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_BtnRed"]
-bg_color = Color(0.75, 0.25, 0.25, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBox_BtnDark"]
+bg_color = Color(0.25, 0.28, 0.35, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -73,6 +74,25 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 6
 
+[node name="StagePanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="StageMargin" type="MarginContainer" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/StagePanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 4
+
+[node name="StageLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/StagePanel/StageMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "STAGE 1"
+
 [node name="HPPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer"]
 layout_mode = 2
 mouse_filter = 2
@@ -93,11 +113,11 @@ theme_override_constants/separation = 4
 [node name="HPLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/HPPanel/HPMargin/HPBox"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 14
 text = "HP: 100 / 100"
 
 [node name="HPProgressBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/HPPanel/HPMargin/HPBox"]
-custom_minimum_size = Vector2(160, 12)
+custom_minimum_size = Vector2(150, 10)
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/background = SubResource("StyleBox_HP_BG")
@@ -121,7 +141,7 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
 text = "COINS: 0 / 0"
 
 [node name="EnemyPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer"]
@@ -165,7 +185,7 @@ theme_override_constants/margin_bottom = 8
 layout_mode = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 text = "⏱ TIME: 00:00.00"
 
 [node name="SpacerRight" type="Control" parent="MarginContainer/VBoxContainer/TopBar"]
@@ -191,9 +211,8 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_font_sizes/font_size = 13
 text = "Move: WASD | Jump: Space (Double Jump in air!)
-Attack: Stomp on Enemy Heads!
-Goal: Reach Golden Beacon on Sky Island!
-Sprint: Shift | R: Restart"
+Stomp: Jump on Enemy Heads!
+Esc: Pause Menu | R: Restart"
 
 [node name="SpacerMiddle" type="Control" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -254,6 +273,8 @@ mouse_filter = 2
 theme_override_font_sizes/font_size = 13
 text = "Jump Buffer: Empty"
 
+[node name="PauseMenu" parent="." instance=ExtResource("2_pause")]
+
 [node name="VictoryScreen" type="Control" parent="."]
 visible = false
 layout_mode = 3
@@ -274,30 +295,26 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Panel" type="PanelContainer" parent="VictoryScreen/Center"]
-custom_minimum_size = Vector2(400, 290)
+custom_minimum_size = Vector2(400, 310)
 layout_mode = 2
-mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBox_Modal")
 
 [node name="Margin" type="MarginContainer" parent="VictoryScreen/Center/Panel"]
 layout_mode = 2
-mouse_filter = 2
 theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 25
+theme_override_constants/margin_top = 22
 theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 25
+theme_override_constants/margin_bottom = 22
 
 [node name="VBox" type="VBoxContainer" parent="VictoryScreen/Center/Panel/Margin"]
 layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="VictoryScreen/Center/Panel/Margin/VBox"]
 layout_mode = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
-theme_override_font_sizes/font_size = 28
-text = "🏆 LEVEL COMPLETE!"
+theme_override_font_sizes/font_size = 26
+text = "🏆 STAGE COMPLETE!"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="VictoryScreen/Center/Panel/Margin/VBox"]
@@ -305,31 +322,42 @@ layout_mode = 2
 
 [node name="TimeResultLabel" type="Label" parent="VictoryScreen/Center/Panel/Margin/VBox"]
 layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 text = "Clear Time: 00:00.00"
 horizontal_alignment = 1
 
 [node name="CoinsResultLabel" type="Label" parent="VictoryScreen/Center/Panel/Margin/VBox"]
 layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
 text = "Coins Collected: 0 / 0"
 horizontal_alignment = 1
 
 [node name="EnemiesResultLabel" type="Label" parent="VictoryScreen/Center/Panel/Margin/VBox"]
 layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
 text = "Enemies Defeated: 0 / 0"
 horizontal_alignment = 1
 
-[node name="VictoryRestartBtn" type="Button" parent="VictoryScreen/Center/Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 38)
+[node name="NextStageBtn" type="Button" parent="VictoryScreen/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBox_Btn")
-text = "🔄 Play Again (Press R)"
+theme_override_styles/normal = SubResource("StyleBox_BtnGreen")
+text = "✨ Next Stage (Random Layout)"
+
+[node name="VictoryRestartBtn" type="Button" parent="VictoryScreen/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBox_BtnDark")
+text = "🔄 Play Again (R)"
+
+[node name="VictoryMainMenuBtn" type="Button" parent="VictoryScreen/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBox_BtnDark")
+text = "🏠 Main Menu"
 
 [node name="GameOverScreen" type="Control" parent="."]
 visible = false
@@ -353,27 +381,23 @@ mouse_filter = 2
 [node name="Panel" type="PanelContainer" parent="GameOverScreen/Center"]
 custom_minimum_size = Vector2(380, 270)
 layout_mode = 2
-mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBox_Modal")
 
 [node name="Margin" type="MarginContainer" parent="GameOverScreen/Center/Panel"]
 layout_mode = 2
-mouse_filter = 2
 theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 25
+theme_override_constants/margin_top = 22
 theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 25
+theme_override_constants/margin_bottom = 22
 
 [node name="VBox" type="VBoxContainer" parent="GameOverScreen/Center/Panel/Margin"]
 layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="GameOverScreen/Center/Panel/Margin/VBox"]
 layout_mode = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.25, 0.25, 1)
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 28
 text = "💀 GAME OVER"
 horizontal_alignment = 1
 
@@ -382,22 +406,27 @@ layout_mode = 2
 
 [node name="Subtitle" type="Label" parent="GameOverScreen/Center/Panel/Margin/VBox"]
 layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 text = "You ran out of health!"
 horizontal_alignment = 1
 
 [node name="TimeSurvivedLabel" type="Label" parent="GameOverScreen/Center/Panel/Margin/VBox"]
 layout_mode = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
 text = "Time Survived: 00:00.00"
 horizontal_alignment = 1
 
 [node name="GameOverRestartBtn" type="Button" parent="GameOverScreen/Center/Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBox_BtnRed")
+theme_override_styles/normal = SubResource("StyleBox_BtnGreen")
 text = "🔄 Try Again (Press R)"
+
+[node name="GameOverMainMenuBtn" type="Button" parent="GameOverScreen/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBox_BtnDark")
+text = "🏠 Main Menu"

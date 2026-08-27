@@ -2,6 +2,7 @@ extends CanvasLayer
 class_name PlatformerHUD
 
 # --- Top HUD Elements ---
+@onready var stage_label: Label = $MarginContainer/VBoxContainer/TopBar/StatsContainer/StagePanel/StageMargin/StageLabel
 @onready var coin_label: Label = $MarginContainer/VBoxContainer/TopBar/StatsContainer/CoinPanel/CoinMargin/CoinLabel
 @onready var enemy_label: Label = $MarginContainer/VBoxContainer/TopBar/StatsContainer/EnemyPanel/EnemyMargin/EnemyLabel
 @onready var hp_label: Label = $MarginContainer/VBoxContainer/TopBar/StatsContainer/HPPanel/HPMargin/HPBox/HPLabel
@@ -15,17 +16,24 @@ class_name PlatformerHUD
 @onready var coyote_label: Label = $MarginContainer/VBoxContainer/DebugPanel/DebugMargin/DebugList/CoyoteLabel
 @onready var buffer_label: Label = $MarginContainer/VBoxContainer/DebugPanel/DebugMargin/DebugList/BufferLabel
 
-# --- Win & Lose Screens ---
+# --- Menus & Screens ---
+@onready var pause_menu: PauseMenu = $PauseMenu
 @onready var victory_panel: Control = $VictoryScreen
 @onready var victory_time_label: Label = $VictoryScreen/Center/Panel/Margin/VBox/TimeResultLabel
 @onready var victory_coins_label: Label = $VictoryScreen/Center/Panel/Margin/VBox/CoinsResultLabel
 @onready var victory_enemies_label: Label = $VictoryScreen/Center/Panel/Margin/VBox/EnemiesResultLabel
+@onready var next_stage_btn: Button = $VictoryScreen/Center/Panel/Margin/VBox/NextStageBtn
 @onready var victory_restart_btn: Button = $VictoryScreen/Center/Panel/Margin/VBox/VictoryRestartBtn
+@onready var victory_main_menu_btn: Button = $VictoryScreen/Center/Panel/Margin/VBox/VictoryMainMenuBtn
+
 @onready var game_over_panel: Control = $GameOverScreen
 @onready var game_over_time_label: Label = $GameOverScreen/Center/Panel/Margin/VBox/TimeSurvivedLabel
 @onready var game_over_restart_btn: Button = $GameOverScreen/Center/Panel/Margin/VBox/GameOverRestartBtn
+@onready var game_over_main_menu_btn: Button = $GameOverScreen/Center/Panel/Margin/VBox/GameOverMainMenuBtn
 
 signal restart_requested
+signal next_stage_requested
+signal main_menu_requested
 
 var total_coins: int = 0
 var collected_coins: int = 0
@@ -36,20 +44,31 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_resolve_node_references()
 	update_stats_display()
-	if victory_panel:
-		victory_panel.visible = false
-	if game_over_panel:
-		game_over_panel.visible = false
-		
+	hide_overlays()
+	
+	if next_stage_btn:
+		next_stage_btn.pressed.connect(func() -> void: next_stage_requested.emit())
 	if victory_restart_btn:
-		victory_restart_btn.pressed.connect(_on_restart_button_pressed)
+		victory_restart_btn.pressed.connect(func() -> void: restart_requested.emit())
+	if victory_main_menu_btn:
+		victory_main_menu_btn.pressed.connect(_on_main_menu_pressed)
 	if game_over_restart_btn:
-		game_over_restart_btn.pressed.connect(_on_restart_button_pressed)
+		game_over_restart_btn.pressed.connect(func() -> void: restart_requested.emit())
+	if game_over_main_menu_btn:
+		game_over_main_menu_btn.pressed.connect(_on_main_menu_pressed)
+		
+	if pause_menu:
+		pause_menu.restart_requested.connect(func() -> void: restart_requested.emit())
+		pause_menu.main_menu_requested.connect(_on_main_menu_pressed)
 
-func _on_restart_button_pressed() -> void:
-	restart_requested.emit()
+func _on_main_menu_pressed() -> void:
+	get_tree().paused = false
+	main_menu_requested.emit()
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 func _resolve_node_references() -> void:
+	if not stage_label:
+		stage_label = find_child("StageLabel", true, false) as Label
 	if not coin_label:
 		coin_label = find_child("CoinLabel", true, false) as Label
 	if not enemy_label:
@@ -70,6 +89,8 @@ func _resolve_node_references() -> void:
 		coyote_label = find_child("CoyoteLabel", true, false) as Label
 	if not buffer_label:
 		buffer_label = find_child("BufferLabel", true, false) as Label
+	if not pause_menu:
+		pause_menu = find_child("PauseMenu", true, false) as PauseMenu
 	if not victory_panel:
 		victory_panel = find_child("VictoryScreen", true, false) as Control
 	if not victory_time_label:
@@ -78,14 +99,26 @@ func _resolve_node_references() -> void:
 		victory_coins_label = find_child("CoinsResultLabel", true, false) as Label
 	if not victory_enemies_label:
 		victory_enemies_label = find_child("EnemiesResultLabel", true, false) as Label
+	if not next_stage_btn:
+		next_stage_btn = find_child("NextStageBtn", true, false) as Button
 	if not victory_restart_btn:
 		victory_restart_btn = find_child("VictoryRestartBtn", true, false) as Button
+	if not victory_main_menu_btn:
+		victory_main_menu_btn = find_child("VictoryMainMenuBtn", true, false) as Button
 	if not game_over_panel:
 		game_over_panel = find_child("GameOverScreen", true, false) as Control
 	if not game_over_time_label:
 		game_over_time_label = find_child("TimeSurvivedLabel", true, false) as Label
 	if not game_over_restart_btn:
 		game_over_restart_btn = find_child("GameOverRestartBtn", true, false) as Button
+	if not game_over_main_menu_btn:
+		game_over_main_menu_btn = find_child("GameOverMainMenuBtn", true, false) as Button
+
+func set_stage_title(text: String) -> void:
+	if not stage_label:
+		_resolve_node_references()
+	if stage_label:
+		stage_label.text = text
 
 func set_total_coins(count: int) -> void:
 	total_coins = count
@@ -106,11 +139,8 @@ func add_defeated_enemy() -> void:
 	_animate_label(enemy_label)
 
 func update_stats_display() -> void:
-	if not coin_label:
-		coin_label = find_child("CoinLabel", true, false) as Label
-	if not enemy_label:
-		enemy_label = find_child("EnemyLabel", true, false) as Label
-		
+	if not coin_label or not enemy_label:
+		_resolve_node_references()
 	if coin_label:
 		coin_label.text = "COINS: %d / %d" % [collected_coins, total_coins]
 	if enemy_label:
@@ -166,6 +196,8 @@ func hide_overlays() -> void:
 		victory_panel.visible = false
 	if game_over_panel:
 		game_over_panel.visible = false
+	if pause_menu:
+		pause_menu.visible = false
 
 func _pop_screen(screen: Control) -> void:
 	screen.scale = Vector2(0.8, 0.8)
