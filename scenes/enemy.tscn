@@ -1,0 +1,133 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="1_enemy"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enemy"]
+albedo_color = Color(0.88, 0.18, 0.24, 1)
+roughness = 0.4
+rim_enabled = true
+rim = 0.5
+rim_tint = 0.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+material = SubResource("StandardMaterial3D_enemy")
+radius = 0.45
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eyes"]
+albedo_color = Color(1, 0.9, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.8, 0.1, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_eye"]
+material = SubResource("StandardMaterial3D_eyes")
+size = Vector3(0.18, 0.15, 0.1)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_main"]
+radius = 0.45
+height = 1.8
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_head"]
+size = Vector3(0.75, 0.25, 0.75)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hazard"]
+radius = 0.5
+height = 1.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_detect"]
+radius = 9.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_HP_BG"]
+albedo_color = Color(0.12, 0.12, 0.15, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_HP_BG"]
+material = SubResource("Mat_HP_BG")
+size = Vector3(0.8, 0.1, 0.04)
+
+[sub_resource type="StandardMaterial3D" id="Mat_HP_Fill"]
+albedo_color = Color(0.9, 0.2, 0.2, 1)
+emission_enabled = true
+emission = Color(0.9, 0.15, 0.15, 1)
+emission_energy_multiplier = 0.8
+
+[sub_resource type="BoxMesh" id="Mesh_HP_Fill"]
+material = SubResource("Mat_HP_Fill")
+size = Vector3(0.76, 0.07, 0.06)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sparks"]
+albedo_color = Color(1, 0.4, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.5, 0.1, 1)
+emission_energy_multiplier = 2.0
+
+[node name="Enemy" type="CharacterBody3D" groups=["enemy"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_enemy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_main")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Body" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="LeftEye" type="MeshInstance3D" parent="Visuals/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.45, -0.4)
+mesh = SubResource("BoxMesh_eye")
+
+[node name="RightEye" type="MeshInstance3D" parent="Visuals/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.45, -0.4)
+mesh = SubResource("BoxMesh_eye")
+
+[node name="HeadHurtbox" type="Area3D" parent="."]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HeadHurtbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+shape = SubResource("BoxShape3D_head")
+
+[node name="BodyHazard" type="Area3D" parent="."]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BodyHazard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("CapsuleShape3D_hazard")
+
+[node name="DetectionArea" type="Area3D" parent="."]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DetectionArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("SphereShape3D_detect")
+
+[node name="HealthBarPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.15, 0)
+
+[node name="BarBackground" type="MeshInstance3D" parent="HealthBarPivot"]
+mesh = SubResource("Mesh_HP_BG")
+
+[node name="BarFill" type="MeshInstance3D" parent="HealthBarPivot/BarBackground"]
+mesh = SubResource("Mesh_HP_Fill")
+
+[node name="DefeatParticles" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+material_override = SubResource("StandardMaterial3D_sparks")
+emitting = false
+amount = 24
+lifetime = 0.55
+one_shot = true
+explosiveness = 0.9
+direction = Vector3(0, 1, 0)
+spread = 180.0
+initial_velocity_min = 4.0
+initial_velocity_max = 7.5
+scale_amount_min = 0.1
+scale_amount_max = 0.25

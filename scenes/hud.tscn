@@ -1,0 +1,390 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_HP_BG"]
+bg_color = Color(0.15, 0.15, 0.2, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_HP_Fill"]
+bg_color = Color(0.2, 0.85, 0.35, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_Modal"]
+bg_color = Color(0.1, 0.12, 0.16, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.95, 0.75, 0.2, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_size = 12
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 15
+
+[node name="TopBar" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="StatsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="HPPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="HPMargin" type="MarginContainer" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/HPPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="HPBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/HPPanel/HPMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="HPLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/HPPanel/HPMargin/HPBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+text = "HP: 100 / 100"
+
+[node name="HPProgressBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/HPPanel/HPMargin/HPBox"]
+custom_minimum_size = Vector2(160, 12)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBox_HP_BG")
+theme_override_styles/fill = SubResource("StyleBox_HP_Fill")
+value = 100.0
+show_percentage = false
+
+[node name="CoinPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CoinMargin" type="MarginContainer" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/CoinPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 4
+
+[node name="CoinLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/CoinPanel/CoinMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 16
+text = "COINS: 0 / 0"
+
+[node name="EnemyPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="EnemyMargin" type="MarginContainer" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/EnemyPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 4
+
+[node name="EnemyLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/StatsContainer/EnemyPanel/EnemyMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "ENEMIES: 0 / 0"
+
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="TimerPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="TimerMargin" type="MarginContainer" parent="MarginContainer/VBoxContainer/TopBar/TimerPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="TimerLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TimerPanel/TimerMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "⏱ TIME: 00:00.00"
+
+[node name="SpacerRight" type="Control" parent="MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ControlsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="MarginContainer/VBoxContainer/TopBar/ControlsPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="ControlsLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/ControlsPanel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "Move: WASD | Jump: Space (Double Jump in air!)
+Attack: Stomp on Enemy Heads!
+Goal: Reach Golden Beacon on Sky Island!
+Sprint: Shift | R: Restart"
+
+[node name="SpacerMiddle" type="Control" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="DebugPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+
+[node name="DebugMargin" type="MarginContainer" parent="MarginContainer/VBoxContainer/DebugPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="DebugList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/DebugPanel/DebugMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer/DebugPanel/DebugMargin/DebugList"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+text = "[ Physics & Game Feel Metrics ]"
+
+[node name="StateLabel" type="Label" parent="MarginContainer/VBoxContainer/DebugPanel/DebugMargin/DebugList"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "Status: GROUNDED"
+
+[node name="VelocityLabel" type="Label" parent="MarginContainer/VBoxContainer/DebugPanel/DebugMargin/DebugList"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "Speed: 0.0 m/s"
+
+[node name="DoubleJumpLabel" type="Label" parent="MarginContainer/VBoxContainer/DebugPanel/DebugMargin/DebugList"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "Double Jump: READY (1)"
+
+[node name="CoyoteLabel" type="Label" parent="MarginContainer/VBoxContainer/DebugPanel/DebugMargin/DebugList"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "Coyote Time: Inactive"
+
+[node name="BufferLabel" type="Label" parent="MarginContainer/VBoxContainer/DebugPanel/DebugMargin/DebugList"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "Jump Buffer: Empty"
+
+[node name="VictoryScreen" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Center" type="CenterContainer" parent="VictoryScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="VictoryScreen/Center"]
+custom_minimum_size = Vector2(400, 260)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_Modal")
+
+[node name="Margin" type="MarginContainer" parent="VictoryScreen/Center/Panel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 25
+
+[node name="VBox" type="VBoxContainer" parent="VictoryScreen/Center/Panel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="VictoryScreen/Center/Panel/Margin/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 28
+text = "🏆 LEVEL COMPLETE!"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VictoryScreen/Center/Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="TimeResultLabel" type="Label" parent="VictoryScreen/Center/Panel/Margin/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+text = "Clear Time: 00:00.00"
+horizontal_alignment = 1
+
+[node name="CoinsResultLabel" type="Label" parent="VictoryScreen/Center/Panel/Margin/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "Coins Collected: 0 / 0"
+horizontal_alignment = 1
+
+[node name="EnemiesResultLabel" type="Label" parent="VictoryScreen/Center/Panel/Margin/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "Enemies Defeated: 0 / 0"
+horizontal_alignment = 1
+
+[node name="RestartPrompt" type="Label" parent="VictoryScreen/Center/Panel/Margin/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.5, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 16
+text = "Press R to Play Again!"
+horizontal_alignment = 1
+
+[node name="GameOverScreen" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Center" type="CenterContainer" parent="GameOverScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="GameOverScreen/Center"]
+custom_minimum_size = Vector2(380, 240)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_Modal")
+
+[node name="Margin" type="MarginContainer" parent="GameOverScreen/Center/Panel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 25
+
+[node name="VBox" type="VBoxContainer" parent="GameOverScreen/Center/Panel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="GameOverScreen/Center/Panel/Margin/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.25, 0.25, 1)
+theme_override_font_sizes/font_size = 32
+text = "💀 GAME OVER"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="GameOverScreen/Center/Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Subtitle" type="Label" parent="GameOverScreen/Center/Panel/Margin/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+text = "You ran out of health!"
+horizontal_alignment = 1
+
+[node name="TimeSurvivedLabel" type="Label" parent="GameOverScreen/Center/Panel/Margin/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 16
+text = "Time Survived: 00:00.00"
+horizontal_alignment = 1
+
+[node name="RestartPrompt" type="Label" parent="GameOverScreen/Center/Panel/Margin/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 16
+text = "Press R to Try Again!"
+horizontal_alignment = 1
