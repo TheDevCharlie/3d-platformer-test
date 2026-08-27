@@ -117,10 +117,6 @@ func _input(event: InputEvent) -> void:
 		elif _air_jumps_left > 0:
 			_execute_double_jump()
 
-	# Respawn / Quick Reset
-	if event.is_action_pressed("reset"):
-		respawn(Vector3(0, 2, 0))
-
 func _physics_process(delta: float) -> void:
 	if _is_dead:
 		return
@@ -333,6 +329,8 @@ func take_damage(amount: float, hazard_source_pos: Vector3) -> void:
 	_is_invulnerable = false
 
 func _die() -> void:
+	if _is_dead:
+		return
 	_is_dead = true
 	died.emit()
 	velocity = Vector3.ZERO

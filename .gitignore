@@ -11,3 +11,4 @@ mono_crash.*.json
 # System ignores
 .DS_Store
 Thumbs.db
+

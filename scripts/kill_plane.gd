@@ -14,12 +14,11 @@ func _on_body_entered(body: Node3D) -> void:
 		
 	var spawn_pos: Vector3 = respawn_point.global_position if respawn_point else Vector3(0, 2, 0)
 	
-	if body is PlayerController:
-		var player: PlayerController = body as PlayerController
-		player.take_damage(35.0, spawn_pos)
-		if player.current_health > 0.0:
-			player.global_position = spawn_pos
-			player.velocity = Vector3.ZERO
+	if body is PlayerController or body.is_in_group("player") or body.name == "Player":
+		if body.has_method("take_damage"):
+			body.take_damage(100.0, spawn_pos)
+		elif body.has_signal("died"):
+			body.emit_signal("died")
 	elif body is CharacterBody3D:
 		body.global_position = spawn_pos
 		body.velocity = Vector3.ZERO

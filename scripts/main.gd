@@ -10,24 +10,32 @@ enum GameState { PLAYING, WON, GAME_OVER }
 
 var _game_state: GameState = GameState.PLAYING
 var _elapsed_time: float = 0.0
+var _is_time_stopped: bool = false
 var _defeated_enemy_ids: Dictionary = {}
+var _total_coins_in_level: int = 0
+var _collected_coins_count: int = 0
 
 func _ready() -> void:
 	# Ensure Main processes input even when the game world is paused
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().paused = false
+	_is_time_stopped = false
+	_game_state = GameState.PLAYING
+	_elapsed_time = 0.0
+	
 	await get_tree().process_frame
 	_setup_level_entities()
 
 func _process(delta: float) -> void:
-	if _game_state == GameState.PLAYING:
+	# Strictly freeze time accumulation whenever game is won, lost, or paused
+	if not _is_time_stopped and _game_state == GameState.PLAYING and not get_tree().paused:
 		_elapsed_time += delta
 		if hud:
 			hud.update_timer(get_formatted_time(_elapsed_time))
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Pressing R when Won or Game Over unpauses and reloads scene
-	if (_game_state == GameState.GAME_OVER or _game_state == GameState.WON) and event.is_action_pressed("reset"):
+	# Pressing R at any time (playing, won, or lost) restarts the run cleanly
+	if event.is_action_pressed("reset") or (event is InputEventKey and event.keycode == KEY_R and event.pressed):
 		get_tree().paused = false
 		get_tree().reload_current_scene()
 
@@ -41,13 +49,13 @@ func _setup_level_entities() -> void:
 
 	# Connect Player Death
 	if player:
-		if not player.died.is_connected(_on_player_died):
-			player.died.connect(_on_player_died)
+		if not player.died.is_connected(_trigger_game_over):
+			player.died.connect(_trigger_game_over)
 
 	# Connect Goal Flag
 	if goal_flag:
-		if not goal_flag.reached.is_connected(_on_goal_reached):
-			goal_flag.reached.connect(_on_goal_reached)
+		if not goal_flag.reached.is_connected(_trigger_victory):
+			goal_flag.reached.connect(_trigger_victory)
 
 	# Gather and count Coins
 	var coins: Array[Node] = []
@@ -56,8 +64,9 @@ func _setup_level_entities() -> void:
 	else:
 		coins = get_tree().get_nodes_in_group("coin")
 
+	_total_coins_in_level = coins.size()
 	if hud:
-		hud.set_total_coins(coins.size())
+		hud.set_total_coins(_total_coins_in_level)
 		
 	for coin: Node in coins:
 		if coin is Coin:
@@ -83,8 +92,12 @@ func _setup_level_entities() -> void:
 			e.tree_exited.connect(func() -> void: _on_enemy_eliminated(enemy_id))
 
 func _on_coin_collected() -> void:
+	_collected_coins_count += 1
 	if hud:
 		hud.add_coin()
+	# Win condition: collecting all coins
+	if _collected_coins_count >= _total_coins_in_level and _total_coins_in_level > 0:
+		_trigger_victory()
 
 func _on_enemy_eliminated(enemy_id: int) -> void:
 	if _defeated_enemy_ids.has(enemy_id):
@@ -93,30 +106,34 @@ func _on_enemy_eliminated(enemy_id: int) -> void:
 	if hud:
 		hud.add_defeated_enemy()
 
-func _on_goal_reached() -> void:
-	if _game_state != GameState.PLAYING:
+func _trigger_victory() -> void:
+	if _game_state != GameState.PLAYING or _is_time_stopped:
 		return
 		
+	_is_time_stopped = true
 	_game_state = GameState.WON
+	
 	var final_time_str: String = get_formatted_time(_elapsed_time)
 	if hud:
+		hud.update_timer(final_time_str)
 		hud.show_victory(final_time_str)
+		
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	
-	# Freeze the entire 3D game world
 	get_tree().paused = true
 
-func _on_player_died() -> void:
-	if _game_state != GameState.PLAYING:
+func _trigger_game_over() -> void:
+	if _game_state != GameState.PLAYING or _is_time_stopped:
 		return
 		
+	_is_time_stopped = true
 	_game_state = GameState.GAME_OVER
+	
 	var final_time_str: String = get_formatted_time(_elapsed_time)
 	if hud:
+		hud.update_timer(final_time_str)
 		hud.show_game_over(final_time_str)
+		
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	
-	# Freeze the entire 3D game world
 	get_tree().paused = true
 
 func get_formatted_time(seconds_total: float) -> String:
